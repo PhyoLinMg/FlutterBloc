@@ -24,8 +24,8 @@ dependencies:
   toast: ^0.1.5
   moor_flutter: ^2.0.0
   chopper: ^3.0.1
-  
   provider: ^3.1.0+1
+  connectivity: ^0.4.5+3
 
 
   # The following adds the Cupertino Icons font to your application.

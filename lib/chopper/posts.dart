@@ -17,7 +17,6 @@ class Posts extends StatelessWidget {
         title: Text("Chopper Blog"),
       ),
       body: _buildBody(context),
-      
     );
   }
 }
@@ -25,46 +24,57 @@ class Posts extends StatelessWidget {
 FutureBuilder<Response> _buildBody(BuildContext context) {
   return FutureBuilder<Response>(
     future: Provider.of<PostApiService>(context).getPosts(),
-    builder: (context,snapshot){
-      if(snapshot.connectionState==ConnectionState.done){
-          final List posts=json.decode(snapshot.data.bodyString);
-          return _buildPosts(context,posts);
-      }
-      else{
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        if(snapshot.hasError){
+          return Center(
+            child: Text(
+              snapshot.error.toString(),
+              textAlign: TextAlign.center,
+              textScaleFactor: 1.3,
+            ),
+          );
+        }
+        
+        final List posts = json.decode(snapshot.data.bodyString);
+        return _buildPosts(context, posts);
+      } else {
         return Center(
           child: CircularProgressIndicator(),
         );
       }
     },
-
   );
 }
-ListView _buildPosts(BuildContext context,List posts){
+
+ListView _buildPosts(BuildContext context, List posts) {
   return ListView.builder(
-      itemCount: posts.length,
-      padding: EdgeInsets.all(6),
-      itemBuilder: (context,index){
-        return Card(
-          elevation: 3,
-          child: ListTile(
-            title: Text(
-              posts[index]['title'],
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(posts[index]['body']),
-            onTap: ()=> _navigateToSinglePost(context,posts[index]['id']),
-            
+    itemCount: posts.length,
+    padding: EdgeInsets.all(6),
+    itemBuilder: (context, index) {
+      return Card(
+        elevation: 3,
+        child: ListTile(
+          title: Text(
+            posts[index]['title'],
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        );
-      },
-
+          subtitle: Text(posts[index]['body']),
+          onTap: () => _navigateToSinglePost(context, posts[index]['id']),
+        ),
+      );
+    },
   );
 }
- void _navigateToSinglePost(BuildContext context, int id) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => Provider(builder: (_) => PostApiService.create(),
-      dispose: (_, PostApiService service) => service.client.dispose(),child: SinglePostPage(postid: id),),
+
+void _navigateToSinglePost(BuildContext context, int id) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => Provider(
+        builder: (_) => PostApiService.create(),
+        dispose: (_, PostApiService service) => service.client.dispose(),
+        child: SinglePostPage(postid: id),
       ),
-    );
-  }
+    ),
+  );
+}
