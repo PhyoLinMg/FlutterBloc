@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:starter/chopper/posts.dart';
+import 'package:starter/network/post_api_service.dart';
 import 'package:starter/ui/bloc/state/counter_state.dart';
 import 'package:starter/ui/bloc/counter_bloc.dart';
 import 'package:starter/ui/preference/preference_page.dart';
@@ -8,7 +11,7 @@ import 'package:toast/toast.dart';
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
         actions: <Widget>[
@@ -17,23 +20,40 @@ class HomePage extends StatelessWidget {
             onPressed: () {
               // Navigate to the PreferencePage
 
-                        Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => PreferencePage()),
-            );
-                     
-                  
-              Toast.show("Toast plugin app", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PreferencePage()),
+              );
+
+              Toast.show("Toast plugin app", context,
+                  duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.not_interested),
+            onPressed: () {
+              // Navigate to the Chopper code
+
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Provider(builder: (_) => PostApiService.create(),
+      dispose: (_, PostApiService service) => service.client.dispose(),child: Posts(),)),
+              );
+
+              Toast.show("Toast plugin app", context,
+                  duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
             },
           )
         ],
       ),
       body: Container(
-        child: MyHomePage(title:"Flutter"),
+        child: MyHomePage(title: "Flutter"),
       ),
     );
   }
 }
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -45,11 +65,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _counterBloc = CounterBloc();
-  
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      builder: (context) =>CounterBloc(),
+      builder: (context) => CounterBloc(),
       child: CounterWidget(widget: widget),
     );
   }
@@ -82,7 +102,6 @@ class CounterWidget extends StatelessWidget {
                   Text(
                     'You have pushed the button this many times:',
                   ),
-                  
                   Text(
                     '${state.counter}',
                     style: Theme.of(context).textTheme.display1,
